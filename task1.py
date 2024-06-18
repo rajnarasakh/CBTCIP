@@ -1,48 +1,66 @@
+def get_feedback(code, guess):
+    """Provides feedback in terms of correct digits in correct place and correct digits in wrong place."""
+    correct_place = sum(c == g for c, g in zip(code, guess))
+    correct_digits = sum(min(code.count(x), guess.count(x)) for x in set(guess))
+    return correct_place, correct_digits - correct_place
 
-import random
-
-print("*****************************************************************************************\nRules of the game-\nThis game is played by Computer vs Player.\n1.  Computer starts by setting a random 4-digit number.\n2.  Player takes an attempt at guessing the number.\n3.  If Player succeeds in the first attempt (despite odds which are highly unlikely) \nthey win the game and are crowned MASTERMIND! \n4.  If not, then Computer hints by revealing which digits or numbers Player got correct. \n(Bonus: The correct positions of the numbers Player got right are also revealed.)\n5.  The game continues till Player eventually is able to guess the number entirely.\n6.  At the end of which they are crowned as a true MASTERMIND!\n*****************************************************************************************")
-
-try:
-    num = random.randrange(1000, 10000)
-    n = int(input("Guess the 4 digit number set by the commputer: "))
-
-    if (n == num):
-        print("CONGRATS!!!You got it in the First try, you seem to be a Mastermind!")
+def mastermind_game():
+    """Main game function for the two-player Mastermind game."""
+    print("Welcome to the two-player Mastermind game!")
+    
+    # Player 1 sets the code
+    while True:
+        code1 = input("Player 1, set a 4-digit code (digits between 1-6): ")
+        if len(code1) == 4 and all(d in '123456' for d in code1):
+            code1 = list(map(int, code1))
+            break
+        else:
+            print("Invalid input. Please enter a 4-digit code with digits between 1 and 6.")
+    
+    attempts_p2 = 0
+    while True:
+        attempts_p2 += 1
+        guess = input("Player 2, make your guess: ")
+        if len(guess) == 4 and all(d in '123456' for d in guess):
+            guess = list(map(int, guess))
+            correct_place, wrong_place = get_feedback(code1, guess)
+            print(f"Feedback: {correct_place} correct place, {wrong_place} correct digit(s) in the wrong place.")
+            if correct_place == 4:
+                print(f"Player 2 guessed the code {code1} in {attempts_p2} attempts!")
+                break
+        else:
+            print("Invalid input. Please enter a 4-digit number with digits between 1 and 6.")
+    
+    # Player 2 sets the code
+    while True:
+        code2 = input("Player 2, set a 4-digit code (digits between 1-6): ")
+        if len(code2) == 4 and all(d in '123456' for d in code2):
+            code2 = list(map(int, code2))
+            break
+        else:
+            print("Invalid input. Please enter a 4-digit code with digits between 1 and 6.")
+    
+    attempts_p1 = 0
+    while True:
+        attempts_p1 += 1
+        guess = input("Player 1, make your guess: ")
+        if len(guess) == 4 and all(d in '123456' for d in guess):
+            guess = list(map(int, guess))
+            correct_place, wrong_place = get_feedback(code2, guess)
+            print(f"Feedback: {correct_place} correct place, {wrong_place} correct digit(s) in the wrong place.")
+            if correct_place == 4:
+                print(f"Player 1 guessed the code {code2} in {attempts_p1} attempts!")
+                break
+        else:
+            print("Invalid input. Please enter a 4-digit number with digits between 1 and 6.")
+    
+    # Determine the winner
+    if attempts_p1 < attempts_p2:
+        print("Player 1 wins and is crowned Mastermind!")
+    elif attempts_p1 > attempts_p2:
+        print("Player 2 wins and is crowned Mastermind!")
     else:
-        ctr = 0
+        print("It's a tie!")
 
-        while (n != num):
-            ctr += 1
-            count = 0
-
-            n = str(n)
-            num = str(num)
-
-            correct = ['X']*4
-            for i in range(0, 4):
-                if (n[i] == num[i]):
-                    count += 1
-                    correct[i] = n[i]
-                else:
-                    continue
-
-            if (count < 4) and (count != 0):
-                print("Oops!!You didn't get it all, but you did get ",
-                      count, " digit(s) correct!")
-                print("Correct Numbers from your guess : ")
-                for k in correct:
-                    print(k, end=' ')
-                print('\n')
-                print('\n')
-                n = int(input("Now try again with the hints given! "))
-
-            elif (count == 0):
-                print("OOPS!!Sorry, No Matches!")
-                n = int(input("Try Again : "))
-
-        if n == num:
-            print("CONGRATS!! You've become a Mastermind!")
-            print("You took only", ctr, "tries, Congrats!!")
-except ValueError as ve:
-    print("Invalid input!!", ve)
+if __name__ == "__main__":
+    mastermind_game()
